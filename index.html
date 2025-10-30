@@ -9,13 +9,13 @@
     .container{background:#fff;padding:24px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.05);width:100%;max-width:480px}
     h1{text-align:center;font-size:1.4rem;margin-bottom:20px}
     ul{list-style:none;padding:0;margin:0}
-    li{display:flex;align-items:center;border-bottom:1px solid #eee;padding:10px 0}
+    li{display:flex;align-items:center;border-bottom:1px solid #eee;padding:10px 0;flex-wrap:wrap}
     li:last-child{border-bottom:0}
-    label{flex:1;cursor:pointer}
-    input[type=checkbox]{width:20px;height:20px;margin-right:8px}
+    label{flex:1;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    input[type=checkbox]{width:20px;height:20px;margin-right:6px}
     .done{text-decoration:line-through;color:#9ca3af}
-    .stamp{font-size:0.85rem;color:#6b7280;margin-left:40px;vertical-align:middle;display:inline-block}
-    .bear-icon{width:20px;height:20px;display:inline-block;margin-left:-40px;margin-right:50px;vertical-align:middle;}
+    .stamp{font-size:0.75rem;color:#6b7280;margin-left:8px;vertical-align:middle;display:inline-block}
+    .bear-icon{width:20px;height:20px;display:inline-block;margin-left:4px;vertical-align:middle;}
     @keyframes bearPop{0%{transform:scale(0);opacity:0;}80%{transform:scale(1.2);}100%{transform:scale(1);opacity:1;}}
     .bear-pop{animation:bearPop 0.4s ease-out forwards;}
     .controls{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
@@ -44,7 +44,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'checklist-v2';
+    const STORAGE_KEY = 'checklist-v3';
     const DEFAULT_TASKS = [
       {text:'도시락 챙김', done:false},
       {text:'지갑 챙김', done:false},
@@ -67,6 +67,11 @@
         const li=document.createElement('li');
         const cb=document.createElement('input');
         cb.type='checkbox';cb.checked=task.done;
+
+        const bear=document.createElement('span');
+        bear.className='bear-icon';
+        bear.textContent='🐻';
+
         const label=document.createElement('label');
         label.textContent=task.text;
 
@@ -77,10 +82,9 @@
           label.classList.add('done');
           const date=new Date();
           stamp.textContent=`(${date.toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'})} ${date.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})})`;
-          const bear=document.createElement('span');
-          bear.className='bear-icon bear-pop';
-          bear.textContent='🐻';
-          stamp.insertAdjacentElement('beforebegin',bear);
+          bear.classList.add('bear-pop');
+        } else {
+          bear.style.visibility='hidden';
         }
 
         cb.addEventListener('change',()=>{
@@ -89,20 +93,18 @@
             label.classList.add('done');
             const date=new Date();
             stamp.textContent=`(${date.toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'})} ${date.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})})`;
-            const bear=document.createElement('span');
-            bear.className='bear-icon bear-pop';
-            bear.textContent='🐻';
-            stamp.insertAdjacentElement('beforebegin',bear);
+            bear.style.visibility='visible';
+            bear.classList.add('bear-pop');
           } else {
             label.classList.remove('done');
             stamp.textContent='';
-            const existingBear=li.querySelector('.bear-icon');
-            if(existingBear) existingBear.remove();
+            bear.style.visibility='hidden';
           }
           saveTasks(tasks);
         });
 
         li.appendChild(cb);
+        li.appendChild(bear);
         li.appendChild(label);
         li.appendChild(stamp);
         list.appendChild(li);
